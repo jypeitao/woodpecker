@@ -33,6 +33,11 @@ int setnonblocking(int fd) {
     return old_option;
 }
 
+/**
+ * ET mode,fd should no block.
+ * addfd(epoll_fd,target_fd,true);
+ * setnonblocking(target_fd);
+ */
 void addfd(int epoll_fd, int fd, bool enable_et) {
     struct epoll_event ev;
     ev.data.fd = fd;
@@ -100,6 +105,7 @@ void edge_triggered_deal(struct epoll_event *events, int num, int epoll_fd, int 
             int client_fd = accept(listen_fd, (struct sockaddr *) &client_addr, &client_addr_len);
 
             addfd(epoll_fd, client_fd, true);
+            setnonblocking(client_fd);
 
             printf("accept client %s\n", inet_ntoa(client_addr.sin_addr));
         } else if (events[i].events & EPOLLIN) {
